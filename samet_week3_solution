@@ -1,0 +1,133 @@
+import json
+import datetime
+from colorama import Fore, init
+init(autoreset=True) 
+task_system = []
+delete_system =[]
+complete_system =[]
+delete_counter_system = []
+counter = 1
+end_task = 0
+def add_task(): # Gorev ve personel atma # Assigning missions and personnel
+    if len(delete_counter_system) == 0:
+        new_func(counter)
+
+    else:
+        new_func(delete_counter_system[0])
+        delete_counter_system.pop(0)
+        
+def new_func(counter): # Gorev ve personel atma # Assigning missions and personnel
+    start_task = date_task()
+    number_task = counter
+    name_task = input("The name of the task:")
+    name_staff = input("The name of the staff:")
+    status_task = (Fore.BLUE + "Pendig")
+    task_depot = {
+            "Task number" : number_task,
+            "Task name" : name_task,
+            "Staff name" : name_staff,
+            "Task status" : status_task,
+            "Start date" : start_task,
+            "End date" : end_task,
+        }
+    task_system.append(task_depot)
+    
+def complete_task(): # Gorev tamamlama # Task completion
+    all_task()
+    task_complete =int(input("Enter the number of the task to be completed:"))
+    for task in task_system:
+        if task["Task number"] == task_complete:
+            task["Task status"] =Fore.GREEN + "Succesful"
+            task["End date"] = date_task()
+            complete_system.append(task) # Tamamlanmis gorevlerin saklanmasi # Saving completed tasks
+            task_system.remove(task)     
+            print(Fore.GREEN + "Task status changed successfully")
+            break
+    else:
+        error_print('Number')   
+
+def delete_task(): # Gorevlerin silinmesi # Deleting tasks
+    all_task()
+    task_delete =int(input("Enter the number of the task to be deleted:"))
+    for task in task_system:
+        if task["Task number"] == task_delete:
+            task["Task status"] = Fore.RED + "Deleted" 
+            task["End date"] = date_task()
+            delete_counter_system.append(task_delete)
+            delete_system.append(task)
+            task_system.remove(task)
+            print(Fore.GREEN + "Task deleted successfully")
+            break
+    else:
+        error_print('Number')    
+
+def completed_task_list(): # Tamamlanmis gorevlerin listelenmesi # Listing of completed tasks
+    print(Fore.GREEN + "*"*10 + "Completed Task List" + "*"*10)
+    if len(complete_system) == 0:
+        error_print('Completed')
+    for task in complete_system:
+        print(f'{task["Task number"]}.{task["Task name"]},{task["Staff name"]},{task["Start date"]},{task["End date"]},{task["Task status"]}')
+                
+def all_task(): # Tum gorev ve sonuclari # All tasks and their results
+    if len(task_system + delete_system + complete_system) == 0:
+         error_print('')
+    print(Fore.GREEN + "*"*10 + "General Task List" + "*"*10)
+    for task in (task_system + delete_system + complete_system):
+        print(f'{task["Task number"]}.{task["Task name"]},{task["Staff name"]},{task["Start date"]},{task["End date"]},{task["Task status"]}')
+        
+def counter_task(): #Silinen gorevlerin numaralarinin tekrar kullanilmasi#Reusing deleted mission numbers
+    global counter
+    counter+=1
+    return counter
+
+def date_task(): # Gorevlerin baslangic ve bitis tarih ve saatleri # Start and end dates and times of tasks
+    date =datetime.datetime.now()
+    return date.strftime(" %d/%m/%y %H:%M")
+
+def error_print(error): # Hata mesajlari # Error messages
+    return print(Fore.RED + f"{error} Task Not Found ")
+
+def exit(): # Cikis ve kayit # Exit and registration
+    task_system.extend(complete_system)
+    task_system.extend(delete_system)
+    with open('task.json', 'w') as json_task:
+        json.dump(task_system,json_task, indent=6, sort_keys=True)
+        print(Fore.GREEN + "All information was recorded.") 
+
+try: # Sistemin ilk calistiginda json dosyasi bulunmadigindan sistemin  verecegei hatayi onler.
+     # It prevents the error that the system will give when the system first starts because there is no json file.
+    with open('task.json', 'r') as json_task:
+        task_system = json.load(json_task)
+except FileNotFoundError:
+    print(Fore.RED + "No data found.")  
+
+while True: # On arayuz # front interface
+    print('*'*36)
+    print(Fore.BLUE + "Welcome to The Task Management System")
+    print("""    1 press to add task
+    2 press to complete the task
+    3 press to delete the task
+    4 press to completed tasks
+    5 press to all tasks      
+    6 press to exit the system""")
+    # Arayuz calistirma blogu  
+    # Interface running blog
+    process = input("Please enter process number=")
+    if process == "1":
+        add_task() 
+        print(Fore.GREEN + "The task was saved successfully")
+        counter_task()
+    elif process == "2":
+        complete_task() 
+    elif process == "3":
+        delete_task()
+    elif process == "4":
+        completed_task_list()
+    elif process == "5":
+        all_task()   
+    elif process == "6":
+        exit()
+        break        
+    else:
+        print(Fore.RED + "Please enter a number between 1 and 6") 
+
