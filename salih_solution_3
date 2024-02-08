@@ -1,0 +1,110 @@
+# The solution of the project
+# Precautions have been taken, considering various possibilities for user entry.
+
+tasks = []
+deleted_task_order_list = []
+completed_files = set() 
+
+def add_new_task(task_name, status="Pending"):
+    for task in tasks:
+        if task['Task Name'] == task_name:
+            print(f'A task with the name "{task_name}" already exists. Please choose a different name.')
+            return
+    if deleted_task_order_list:
+        order_number = deleted_task_order_list.pop(0)
+    else:
+        order_number = max((task['Order Number'] for task in tasks), default=0) + 1
+    task = {'Order Number': order_number, 'Task Name': task_name, 'Status': status}
+    tasks.append(task)
+    print(f'New task "{task_name}" added. (Order Number: {order_number}, Status: {status})')
+
+def complete_task(order_number):
+    for task in tasks:
+        if task['Order Number'] == order_number and task['Status'] != 'Deleted':
+            file_name = task['Task Name']
+            if file_name in completed_files:
+                print(f'Task "{file_name}" is already completed.')
+            else:
+                task['Status'] = 'Successful'
+                completed_files.add(file_name)
+                print(f'Task "{file_name}" completed.')
+            return
+    print(f'No task found with Order Number {order_number}.')
+
+def delete_task(order_number):
+    for task in tasks:
+        if task['Order Number'] == order_number and task['Status'] != 'Deleted':
+            task['Status'] = 'Deleted'
+            file_name = task['Task Name']
+            print(f'Task "{file_name}" deleted.')
+            deleted_task_order_list.append(order_number)
+            completed_files.discard(file_name)
+            return
+    print(f'No task found with Order Number {order_number}.')
+
+def completed_tasks_list():
+    completed_tasks = [task for task in tasks if task['Status'] == 'Successful']
+    if completed_tasks:
+        print('Completed Tasks:')
+        for task in sorted(completed_tasks, key=lambda x: x['Order Number']):
+            print(f'- {task["Task Name"]} (Order Number: {task["Order Number"]})')
+    else:
+        print('No completed tasks.')
+
+def all_tasks_list():
+    active_tasks = [task for task in tasks if task['Status'] != 'Deleted']
+    if active_tasks:
+        sorted_tasks = sorted(active_tasks, key=lambda x: x['Order Number'])
+        print('All Tasks:')
+        for task in sorted_tasks:
+            print(f'- {task["Task Name"]} (Order Number: {task["Order Number"]}, Status: {task["Status"]})')
+    else:
+        print('No tasks available.')
+
+while True:
+    print("\nTask Management Application:\n")
+    print("1. Add a new task")
+    print("2. Complete a task")
+    print("3. Delete a task")
+    print("4. List completed tasks")
+    print("5. List all tasks")
+    print("6. Exit")
+
+    choice = input("Please choose an operation (1-6): ")
+
+    if choice == '1':
+        new_task_name = input("Enter the name of the new task: ")
+        if new_task_name.isalpha():
+            add_new_task(new_task_name)
+        else:
+            print("Invalid input. Please enter a word.")
+
+    elif choice == '2':
+        completed_task_order_input = input("Enter the order number of the task to be completed: ")
+        if completed_task_order_input.isdigit():
+            completed_task_order = int(completed_task_order_input)
+            complete_task(completed_task_order)
+        else:
+            print("Invalid input. Please enter a valid integer.")
+
+    elif choice == '3':
+        deleted_task_order_input = input("Enter the order number of the task to be deleted: ")
+        if deleted_task_order_input.isdigit():
+            deleted_task_order = int(deleted_task_order_input)
+            delete_task(deleted_task_order)
+        else:
+            print("Invalid input. Please enter a valid integer.")
+
+    elif choice == '4':
+        completed_tasks_list()
+
+    elif choice == '5':
+        all_tasks_list()
+
+    elif choice == '6':
+        print('Exiting...')
+        break
+
+    else:
+        print('You made an invalid choice. Please try again.')
+
