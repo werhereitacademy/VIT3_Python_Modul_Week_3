@@ -1,110 +1,109 @@
-'''Proje Açıklaması: Bu ödevde, Python programlama dilini kullanarak bir görev yöneticisi uygulaması oluşturacaksınız. Bu uygulama, kullanıcılara görevlerini eklemelerine, tamamlamalarına, silmelerine ve listelemelerine olanak tanır.
+'''Project Description: In this assignment, you will create a task manager application using the Python programming language. This application allows users to add, complete, delete, and list their tasks.
 '''
 
 
-liste = []
-bos_sira_numaralari = []
-silinen_gorevler = []
-def gorev_ekle(gorev,durum = 'Beklemede'):
-    yeni_gorev = {'Görev': gorev , 'Durum' : durum, 'Sıra Numarası' : sira_numarasi_bul()}
-    liste.append(yeni_gorev)
-    return yeni_gorev
-    
-#sira numarasini listenin eleman sayisindan aliyoruz.
+task_list = []
+empty_sequence_numbers = []
+deleted_tasks = []
 
-def sira_numarasi_bul():
-    if len(bos_sira_numaralari) == 0:
-        if len(liste) == 0:
+def add_task(task, status='Pending'):
+    new_task = {'Task': task , 'Status' : status, 'Sequence Number' : find_sequence_number()}
+    task_list.append(new_task)
+    return new_task
+
+#We are getting the sequence number from the number of elements in the list.
+
+def find_sequence_number():
+    if len(empty_sequence_numbers) == 0:
+        if len(task_list) == 0:
             return 1
         else:
-            return len(liste) + 1
-     #bosta sira numarasi yoksa son elemanin sıra numarasinin bir fazlasini donduruyoruz.
-     #eger bosta sira numarasi varsa en kucuk sira numrasini listeden cikarip donduruyoruz boylece ayni siraya sahip iki gorevi engelliyoruz.
+            return len(task_list) + 1
+ #  If there are no empty sequence numbers, we return one more than the sequence number of the last element. If there are empty sequence numbers, we remove and return the smallest sequence number from the list, thus preventing two tasks from having the same sequence number.
+     
     else:
-        bos_sira_numaralari.sort()
-        return bos_sira_numaralari.pop(0)
-    
-def gorevi_tamamla(sira_numarasi):
-    for i in liste:
-        if i['Sıra Numarası'] == sira_numarasi:
-            i['Durum'] = 'Basarili'
-            return i
-        #eger gorev tamamlandi ise gorevi dondurecek aksi durumda False doner.
-        #Dondurulen degeri kullanarak gorev tamamlanmasi kontrol edilir.
-        #Boylece kullaniciya gerekli bilgi verilir.
-    return False
-        
-def gorevi_sil(sira_numarasi):
-    for gorev in liste:
-        if gorev['Sıra Numarası'] == sira_numarasi:
-            gorev['Durum'] = 'Silindi'
-            silinen_gorevler.append(gorev)
-            liste.remove(gorev)
-            bos_sira_numaralari.append(sira_numarasi)
-            return gorev
-    return False
-def tamamlanmis_gorevleri_listele():
-    tamamlanmis_gorevler = []
-    for gorev in liste:
-        if gorev['Durum'] == 'Basarili':
-            tamamlanmis_gorevler.append(gorev)
-    return tamamlanmis_gorevler
+        empty_sequence_numbers.sort()
+        return empty_sequence_numbers.pop(0)
 
-def tum_gorevleri_listele():
-    tum_liste = liste + silinen_gorevler
-    tum_liste.sort(key = lambda i: i['Sıra Numarası'])
-    return tum_liste
-    return silinen_gorevler
+def complete_task(task_number):
+    for i in task_list:
+        if i['Sequence Number'] == task_number:
+            i['Status'] = 'Successful'
+            return i
+    #If the task is completed, it returns the task; otherwise, it returns False. The returned value is used to check if the task is completed, providing the necessary information to the user.
+    return False
+
+def delete_task(task_number):
+    for task in task_list:
+        if task['Sequence Number'] == task_number:
+            task['Status'] = 'Deleted'
+            deleted_tasks.append(task)
+            task_list.remove(task)
+            empty_sequence_numbers.append(task_number)
+            return task
+    return False
+
+def list_completed_tasks():
+    completed_tasks = []
+    for task in task_list:
+        if task['Status'] == 'Successful':
+            completed_tasks.append(task)
+    return completed_tasks
+
+def list_all_tasks():
+    all_tasks = task_list + deleted_tasks
+    all_tasks.sort(key = lambda i: i['Sequence Number'])
+    return all_tasks
 
 
 def program():
     print('''
-    1. Gorev Ekle
-    2. Tamamla
-    3. Gorev Sil
-    4. Tamamlanmis Gorevleri Listele
-    5. Tum Gorevleri Listele
-    6. Cikis''')
-
-
+    1. Add Task
+    2. Complete Task
+    3. Delete Task
+    4. List Completed Tasks
+    5. List All Tasks
+    6. Exit''')
 
     while True:
-        secim = input('Yapmak istediginiz islemi seciniz: ')
-        if secim == '1':
-            gorev = input("GOREVI GIRINIZ:")
-            yeni_gorev = gorev_ekle(gorev)
-            print("Gorev Eklendi")
-            print(yeni_gorev)
-        
-        elif secim == '2':
-            sira_numarasi = int(input('Sıra Numarasını Giriniz: '))
-            tamamlandi = gorevi_tamamla(sira_numarasi)
-            if tamamlandi:
-                print('Gorev Tamamlandı')
-                print(tamamlandi)
+        choice = input('Select the action you want to perform: ')
+        if choice == '1':
+            task = input("ENTER THE TASK:")
+            new_task = add_task(task)
+            print("Task Added")
+            print(new_task)
+
+        elif choice == '2':
+            task_number = int(input('Enter the Task Number: '))
+            completed = complete_task(task_number)
+            if completed:
+                print('Task Completed')
+                print(completed)
             else:
-                print('Gorev Bulunamadı')
-        elif secim == '3':
-            sira_numarasi = int(input('Sıra Numarasını Giriniz: '))
-            silinen_gorev = gorevi_sil(sira_numarasi)
-            if silinen_gorev:
-                print('Gorev Silindi')
-                print(silinen_gorev)
+                print('Task Not Found')
+
+        elif choice == '3':
+            task_number = int(input('Enter the Task Number: '))
+            deleted_task = delete_task(task_number)
+            if deleted_task:
+                print('Task Deleted')
+                print(deleted_task)
             else:
-                print('Gorev Bulunamadı')
-        
-        elif secim == '4':
-            print('Tamamlanmis Gorevler:')
-            print(tamamlanmis_gorevleri_listele())
-            
-        elif secim == '5':
-            print('Tum Gorevler:')
-            print( tum_gorevleri_listele())
-        
-        elif secim == '6':
-            print('Cikis Yapildi')
+                print('Task Not Found')
+
+        elif choice == '4':
+            print('Completed Tasks:')
+            print(list_completed_tasks())
+
+        elif choice == '5':
+            print('All Tasks:')
+            print(list_all_tasks())
+
+        elif choice == '6':
+            print('Exiting')
             break
+
         else:
-            print('Hatali Secim')
-                
-program()            
+            print('Invalid Choice')
+
+program()
