@@ -17,7 +17,7 @@ def read_from_json():
 
 def write2json(task_list: list):
     global file
-    with open(file, 'w+') as fp:
+    with open(file, 'w') as fp:
         json.dump(task_list, fp)
     return task_list
 
@@ -51,7 +51,7 @@ def add_task(task_name):
 
 def complete_task(task_id):
     res = False
-    if not check_file(file):
+    if check_file(file):
         task_list = read_from_json()
         for i in range(len(task_list)):
             if task_list[i]['task_id'] == task_id:
@@ -64,7 +64,7 @@ def complete_task(task_id):
 
 def delete_task(task_id):
     res = False
-    if not check_file(file):
+    if check_file(file):
         task_list = read_from_json()
         for i in range(len(task_list)):
             if task_list[i]['task_id'] == task_id:
@@ -87,7 +87,7 @@ def list_tasks(lists):
 
 def get1task(task_id):
     res = 'Error!!!'
-    if not check_file(file):
+    if check_file(file):
         task_list = read_from_json()
         for i in task_list:
             if i['task_id'] == task_id:
