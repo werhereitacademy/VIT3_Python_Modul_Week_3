@@ -150,7 +150,9 @@ if __name__ == "__main__":
             print(list_tasks(['Pending', 'Completed']))
 
         elif user_input == 'quit':
-            pass
+            quit_app()
 
         else:
             continue
+else:
+    pass
