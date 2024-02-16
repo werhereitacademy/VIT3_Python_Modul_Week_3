@@ -1,0 +1,77 @@
+tasks = []  # List where tasks are stored
+task_counter = 1  # Sequence number to be automatically assigned to each task
+
+
+# Function that lists all tasks with their sequence number and status
+def list_tasks():
+    print("All Missions:")
+    for task in tasks:
+        print(f"{task['Sequence Number']}. {task['Task Name']} - Status: {task['Status']}")
+
+
+# Function that adds a new task
+def add_task():
+    global task_counter
+    task_name = input("Enter the name of the new task: ")
+    new_task = {
+        "Sequence Number": task_counter,
+        "Task Name": task_name,
+        "Status": "Pending"
+    }
+    tasks.append(new_task)
+    task_counter += 1
+    print("New task added.")
+
+
+# Function that completes a task
+def complete_task():
+    task_number = int(input("Enter the sequence number of the completed task: "))
+    for task in tasks:
+        if task["Sequence Number"] == task_number:
+            task["Status"] = "Successful"
+            print(f"{task['Task Name']} completed.")
+            return
+    print("Task not found.")
+
+
+# Function that deletes a task
+def delete_task():
+    task_number = int(input("Enter the sequence number of the task to be deleted: "))
+    for task in tasks:
+        if task["Sequence Number"] == task_number:
+            task["Status"] = "Deleted"
+            print(f"{task['Task Name']} deleted.")
+            return
+    print("Task not found.")
+
+
+# Main loop where the user can perform operations
+while True:
+    print("\nActions You Can Do:")
+    print("1. Add new task")
+    print("2. Complete a mission")
+    print("3. Delete a task")
+    print("4. List completed tasks")
+    print("5. List all tasks")
+    print("6. Exit")
+
+    choice = input("Please enter an option: ")
+
+    # Conditions that perform the relevant action according to the user's choice
+    if choice == "1":
+        add_task()  # A new task is added
+    elif choice == "2":
+        complete_task()  # A task is completed
+    elif choice == "3":
+        delete_task()  # A task is deleted
+    elif choice == "4":
+        tasks.sort(key=lambda x: x["Sequence Number"])  # Tasks are sorted by sequence number
+        list_tasks()  # Completed tasks are listed
+    elif choice == "5":
+        tasks.sort(key=lambda x: x["Sequence Number"])  # Tasks are sorted by sequence number
+        list_tasks()  # All tasks are listed
+    elif choice == "6":
+        print("Exiting...")  # Exits the program
+        break
+    else:
+        print("You entered an invalid option. Please try again.")
